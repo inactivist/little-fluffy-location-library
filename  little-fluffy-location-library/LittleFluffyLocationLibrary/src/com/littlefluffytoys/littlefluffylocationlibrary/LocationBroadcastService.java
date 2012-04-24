@@ -104,7 +104,7 @@ public class LocationBroadcastService extends Service {
         final LocationInfo locationInfo = new LocationInfo(context);
         locationIntent.putExtra(LocationLibraryConstants.LOCATION_BROADCAST_EXTRA_LOCATIONINFO, locationInfo);
         if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": Broadcasting " + (isPeriodicBroadcast ? "periodic" : "latest") + " location update timed at " + LocationInfo.formatTimeAndDay(prefs.getLong(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_TIME, System.currentTimeMillis()), true));
-        context.sendBroadcast(locationIntent);
+        context.sendBroadcast(locationIntent, "android.permission.ACCESS_FINE_LOCATION");
     }
 
     @Override

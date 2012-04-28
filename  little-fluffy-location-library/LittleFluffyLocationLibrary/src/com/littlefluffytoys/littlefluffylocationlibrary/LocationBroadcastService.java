@@ -128,12 +128,12 @@ public class LocationBroadcastService extends Service {
             final PendingIntent oneshotReceiver = PendingIntent.getBroadcast(getApplicationContext(), 0, receiver, PendingIntent.FLAG_UPDATE_CURRENT);
             locationManager.requestSingleUpdate(criteria, oneshotReceiver);
         }
-        else { // Froyo
+        else { // pre-Gingerbread
             if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": Force location updates (pre-Gingerbread), as current location is beyond the oldest location permitted");
             // one-shot not available pre-Gingerbread, so start updates, and when one is received, stop updates.
             final String provider = locationManager.getBestProvider(criteria, true);
             if (provider != null) {
-                locationManager.requestLocationUpdates(provider, 0, 0, froyoUpdatesListener, LocationBroadcastService.this.getMainLooper());
+                locationManager.requestLocationUpdates(provider, 0, 0, preGingerbreadUpdatesListener, LocationBroadcastService.this.getMainLooper());
                 // don't stop the service, the callback will do that
                 return true;
             }
@@ -152,10 +152,16 @@ public class LocationBroadcastService extends Service {
         alarm.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (delayInSeconds * 1000), pIntent);
     }
 
-    final LocationListener froyoUpdatesListener = new LocationListener() {
+    final LocationListener preGingerbreadUpdatesListener = new LocationListener() {
         public void onLocationChanged(Location location) {
             if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": Single Location Update Received: " + location.getLatitude() + "," + location.getLongitude());
-            ((LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE)).removeUpdates(froyoUpdatesListener);
+            ((LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE)).removeUpdates(preGingerbreadUpdatesListener);
+            
+            if (!LocationLibraryConstants.SUPPORTS_FROYO) {
+                // this will not be broadcast by the passive location updater, so we will process it ourselves
+                PassiveLocationChangedReceiver.processLocation(LocationBroadcastService.this, location);
+            }
+            
             // Broadcast it without significant delay.
             forceDelayedServiceCall(getApplicationContext(), 1);
             // Done with our work... stop the service!

@@ -40,5 +40,6 @@ public class LocationLibraryConstants {
   protected static final String SP_KEY_LAST_LOCATION_BROADCAST_TIME = "LFT_SP_KEY_LAST_LOCATION_SUBMIT_TIME";
   protected static final String SP_KEY_RUN_ONCE = "LFT_SP_KEY_RUN_ONCE";
   
+  protected static boolean SUPPORTS_FROYO = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO;
   protected static boolean SUPPORTS_GINGERBREAD = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD;
 }

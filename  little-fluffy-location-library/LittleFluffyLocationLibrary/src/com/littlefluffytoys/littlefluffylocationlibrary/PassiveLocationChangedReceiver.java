@@ -50,7 +50,7 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
     String key = LocationManager.KEY_LOCATION_CHANGED;
     
     if (intent.hasCategory(LocationLibraryConstants.INTENT_CATEGORY_ONE_SHOT_UPDATE)) {
-        // it's a one-shot update
+        // it's a one-shot update from Gingerbread and higher
         if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ":onReceive: on-demand location update received");
 
         // we know that the passive provider will shortly get an update from this.
@@ -60,8 +60,15 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
         LocationBroadcastService.forceDelayedServiceCall(context, 30);
     }
     else if (intent.hasExtra(key)) {
-      // This update came from Passive provider, so we can extract the location directly.
-      final Location location = (Location)intent.getExtras().get(key);
+        // This update came from Passive provider, so we can extract the location directly.
+        processLocation(context, (Location)intent.getExtras().get(key));
+    }
+    else {
+        if (LocationLibrary.showDebugOutput) Log.w(LocationLibraryConstants.TAG, TAG + ":onReceive: Unknown update received");
+    }
+  }
+  
+  protected static void processLocation(final Context context, final Location location) {
       final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
       final float lastLat = prefs.getFloat(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_LAT, Long.MIN_VALUE);
       final float lastLong = prefs.getFloat(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_LNG, Long.MIN_VALUE);
@@ -108,9 +115,5 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
           // broadcast it
           LocationBroadcastService.sendBroadcast(context, prefs, false);
       }
-    }
-    else {
-        if (LocationLibrary.showDebugOutput) Log.w(LocationLibraryConstants.TAG, TAG + ":onReceive: Unknown update received");
-    }
   }
 }

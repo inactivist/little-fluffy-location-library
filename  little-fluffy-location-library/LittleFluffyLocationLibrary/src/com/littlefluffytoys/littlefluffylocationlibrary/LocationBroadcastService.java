@@ -126,7 +126,13 @@ public class LocationBroadcastService extends Service {
             // just request a single update. The passive provider will pick it up.
             final Intent receiver = new Intent(getApplicationContext(), PassiveLocationChangedReceiver.class).addCategory(LocationLibraryConstants.INTENT_CATEGORY_ONE_SHOT_UPDATE);
             final PendingIntent oneshotReceiver = PendingIntent.getBroadcast(getApplicationContext(), 0, receiver, PendingIntent.FLAG_UPDATE_CURRENT);
-            locationManager.requestSingleUpdate(criteria, oneshotReceiver);
+            try {
+                locationManager.requestSingleUpdate(criteria, oneshotReceiver);
+            }
+            catch (IllegalArgumentException ex) {
+                // thrown if there are no providers, e.g. GPS is off
+                if (LocationLibrary.showDebugOutput) Log.w(LocationLibraryConstants.TAG, TAG + ": IllegalArgumentException during call to locationManager.requestSingleUpdate - probable cause is that all location providers are off. Details: " + ex.getMessage());
+            }
         }
         else { // pre-Gingerbread
             if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": Force location updates (pre-Gingerbread), as current location is beyond the oldest location permitted");

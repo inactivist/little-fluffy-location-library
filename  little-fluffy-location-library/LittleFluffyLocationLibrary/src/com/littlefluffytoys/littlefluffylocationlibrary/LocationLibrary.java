@@ -54,7 +54,7 @@ public class LocationLibrary {
         return alarmFrequency;
     }
     
-    protected static void startAlarmAndListener(final Context context) {
+    public static void startAlarmAndListener(final Context context) {
         if (showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": startAlarmAndListener: alarmFrequency=" + (alarmFrequency == LocationLibraryConstants.DEFAULT_ALARM_FREQUENCY ? "default:" : "") + alarmFrequency/1000 + " secs, locationMaximumAge=" + (locationMaximumAge == LocationLibraryConstants.DEFAULT_MAXIMUM_LOCATION_AGE ? "default:" : "") + locationMaximumAge/1000 + " secs");
         
         final PendingIntent alarmIntent = PendingIntent.getService(context, LocationLibraryConstants.LOCATION_BROADCAST_REQUEST_CODE_REPEATING_ALARM, new Intent(context, LocationBroadcastService.class), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -75,6 +75,25 @@ public class LocationLibrary {
         }
 
         if (showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": startAlarmAndListener completed");
+    }
+    
+    public static void stopAlarmAndListener(final Context context) {
+       
+    	final PendingIntent alarmIntent = PendingIntent.getService(context, LocationLibraryConstants.LOCATION_BROADCAST_REQUEST_CODE_REPEATING_ALARM, new Intent(context, LocationBroadcastService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        final AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        
+        // cancel any existing alarm
+        am.cancel(alarmIntent);
+
+        if (LocationLibraryConstants.SUPPORTS_FROYO) {
+            final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            final Intent passiveIntent = new Intent(context, PassiveLocationChangedReceiver.class);
+            final PendingIntent locationListenerPassivePendingIntent = PendingIntent.getBroadcast(context, 0, passiveIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            locationManager.removeUpdates(locationListenerPassivePendingIntent);
+        }
+
+        if (showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": stopAlarmAndListener completed");
     }
     
     /**

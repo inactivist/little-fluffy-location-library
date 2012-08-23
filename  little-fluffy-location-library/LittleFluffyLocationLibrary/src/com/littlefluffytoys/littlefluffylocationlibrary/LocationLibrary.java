@@ -41,6 +41,8 @@ public class LocationLibrary {
     
     private static final String TAG = "LocationLibrary";
     
+    protected static String broadcastPrefix = LocationLibraryConstants.BROADCAST_DEFAULT_PREFIX;
+
     private static boolean initialised = false;
     
     private static long alarmFrequency = LocationLibraryConstants.DEFAULT_ALARM_FREQUENCY;
@@ -184,6 +186,70 @@ public class LocationLibrary {
         if (!initialised) {
             LocationLibrary.broadcastEveryLocationUpdate = broadcastEveryLocationUpdate;
             initialiseLibrary(context, alarmFrequency, locationMaximumAge);
+        }    
+    }
+    
+    /**
+     * To use this library, call initialiseLibrary from your Application's onCreate method,
+     * having set up your manifest as detailed in the project documentation.
+     * 
+     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
+     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
+     * 
+     * @see #initialiseLibrary(Context)
+     */
+    public static void initialiseLibrary(final Context context, final String broadcastPrefix) {
+        if (!initialised) {
+            LocationLibrary.broadcastPrefix = broadcastPrefix;
+            initialiseLibrary(context);
+         }
+    }
+    
+    /**
+     * To use this library, call initialiseLibrary from your Application's onCreate method,
+     * having set up your manifest as detailed in the project documentation.
+     * 
+     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
+     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
+     * 
+     * @see #initialiseLibrary(Context, long, int)
+     */
+    public static void initialiseLibrary(final Context context, final long alarmFrequency, final int locationMaximumAge, final String broadcastPrefix) {
+        if (!initialised) {
+            LocationLibrary.broadcastPrefix = broadcastPrefix;
+            initialiseLibrary(context, alarmFrequency, locationMaximumAge);
+         }
+    }
+    
+    /**
+     * To use this library, call initialiseLibrary from your Application's onCreate method,
+     * having set up your manifest as detailed in the project documentation.
+     * 
+     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
+     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
+     * 
+     * @see #initialiseLibrary(Context, boolean)
+     */
+    public static void initialiseLibrary(final Context context, final boolean broadcastEveryLocationUpdate, final String broadcastPrefix) {
+        if (!initialised) {
+            LocationLibrary.broadcastPrefix = broadcastPrefix;
+            initialiseLibrary(context, broadcastEveryLocationUpdate);
+         }
+    }
+    
+    /**
+     * To use this library, call initialiseLibrary from your Application's onCreate method,
+     * having set up your manifest as detailed in the project documentation.
+     * 
+     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
+     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
+     * 
+     * @see #initialiseLibrary(Context, long, int, boolean)
+     */
+    public static void initialiseLibrary(final Context context, final long alarmFrequency, final int locationMaximumAge, final boolean broadcastEveryLocationUpdate, final String broadcastPrefix) {
+        if (!initialised) {
+            LocationLibrary.broadcastPrefix = broadcastPrefix;
+            initialiseLibrary(context, alarmFrequency, locationMaximumAge, broadcastEveryLocationUpdate);
         }    
     }
     

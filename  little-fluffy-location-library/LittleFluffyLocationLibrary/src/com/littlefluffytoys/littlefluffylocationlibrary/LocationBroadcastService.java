@@ -17,6 +17,7 @@
 
 package com.littlefluffytoys.littlefluffylocationlibrary;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -100,7 +101,7 @@ public class LocationBroadcastService extends Service {
     };
     
     protected static void sendBroadcast(final Context context, final SharedPreferences prefs, final boolean isPeriodicBroadcast) {
-        final Intent locationIntent = new Intent(isPeriodicBroadcast ? LocationLibraryConstants.LOCATION_CHANGED_PERIODIC_BROADCAST_ACTION : LocationLibraryConstants.LOCATION_CHANGED_TICKER_BROADCAST_ACTION);
+        final Intent locationIntent = new Intent(LocationLibrary.broadcastPrefix + (isPeriodicBroadcast ? LocationLibraryConstants.LOCATION_CHANGED_PERIODIC_BROADCAST_ACTION : LocationLibraryConstants.LOCATION_CHANGED_TICKER_BROADCAST_ACTION));
         final LocationInfo locationInfo = new LocationInfo(context);
         locationIntent.putExtra(LocationLibraryConstants.LOCATION_BROADCAST_EXTRA_LOCATIONINFO, locationInfo);
         if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": Broadcasting " + (isPeriodicBroadcast ? "periodic" : "latest") + " location update timed at " + LocationInfo.formatTimeAndDay(prefs.getLong(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_TIME, System.currentTimeMillis()), true));
@@ -116,6 +117,7 @@ public class LocationBroadcastService extends Service {
      * 
      * @return true if the service should stay awake, false if not
      */
+    @TargetApi(9)
     public boolean forceLocationUpdate() {
         final LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         final Criteria criteria = new Criteria();

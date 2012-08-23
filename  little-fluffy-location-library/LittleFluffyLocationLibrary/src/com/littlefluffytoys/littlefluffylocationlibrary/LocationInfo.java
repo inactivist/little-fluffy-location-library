@@ -94,4 +94,12 @@ public class LocationInfo implements Serializable {
     public static String formatTimeAndDay(final long timestamp, final boolean includeSeconds) {
         return (DateFormat.format("kk:mm" + (includeSeconds ? ".ss" : "") + ", E", timestamp).toString());
     }
+    
+    @Override
+    public String toString() {
+        return (String.format("lastLocationUpdateTimestamp=%1$s lastLocationBroadcastTimestamp=%2$s lastLat=%3$.6f lastLong=%4$.6f lastAccuracy=%5$d",
+                lastLocationUpdateTimestamp != 0 ? formatTimeAndDay(lastLocationUpdateTimestamp, true) : "none",
+                lastLocationBroadcastTimestamp != 0 ? formatTimeAndDay(lastLocationBroadcastTimestamp, true) : "none",
+                lastLat, lastLong, lastAccuracy));
+    }
 }

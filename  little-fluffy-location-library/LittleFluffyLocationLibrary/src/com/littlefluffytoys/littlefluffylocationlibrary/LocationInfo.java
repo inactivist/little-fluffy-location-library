@@ -28,7 +28,7 @@ import android.text.format.DateFormat;
  * 
  * Project home and documentation: {@link code.google.com/p/little-fluffy-location-library}
  * 
- * @author Kenton Price, Little Fluffy Toys Ltd - {@link www.littlefluffytoys.com}
+ * @author Kenton Price, Little Fluffy Toys Ltd - {@link www.littlefluffytoys.mobi}
  */
 public class LocationInfo implements Serializable {
     

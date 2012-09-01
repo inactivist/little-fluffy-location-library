@@ -25,7 +25,6 @@ public class LocationLibraryConstants {
   public static final long DEFAULT_ALARM_FREQUENCY = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
   public static final int DEFAULT_MAXIMUM_LOCATION_AGE = (int) AlarmManager.INTERVAL_HOUR;
   
-  public static final String BROADCAST_DEFAULT_PREFIX = "com.littlefluffytoys";
   protected static final String LOCATION_CHANGED_PERIODIC_BROADCAST_ACTION = ".littlefluffylocationlibrary.LOCATION_CHANGED";
   public static String getLocationChangedPeriodicBroadcastAction() {
       return LocationLibrary.broadcastPrefix + LOCATION_CHANGED_PERIODIC_BROADCAST_ACTION;

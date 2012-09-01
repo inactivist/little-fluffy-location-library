@@ -32,7 +32,7 @@ import android.util.Log;
  * 
  * Project home and documentation: {@link code.google.com/p/little-fluffy-location-library}
  * 
- * @author Kenton Price, Little Fluffy Toys Ltd - {@link www.littlefluffytoys.com}
+ * @author Kenton Price, Little Fluffy Toys Ltd - {@link www.littlefluffytoys.mobi}
  */
 public class LocationLibrary {
     
@@ -41,7 +41,7 @@ public class LocationLibrary {
     
     private static final String TAG = "LocationLibrary";
     
-    protected static String broadcastPrefix = LocationLibraryConstants.BROADCAST_DEFAULT_PREFIX;
+    protected static String broadcastPrefix;
 
     private static boolean initialised = false;
     
@@ -104,10 +104,13 @@ public class LocationLibrary {
      * 
      * This constructor uses defaults specified in LocationLibraryConstants for alarmFrequency ({@link android.app.AlarmManager#INTERVAL_FIFTEEN_MINUTES AlarmManager.INTERVAL_FIFTEEN_MINUTES})
      * and locationMaximumAge ({@link android.app.AlarmManager#INTERVAL_HOUR AlarmManager.INTERVAL_HOUR}), and broadcastEveryLocationUpdate by default is false.
+     * 
+     * @param broadcastPrefix The prefix to the broadcast intent string that tells the client app the location has changed.
      */
-    public static void initialiseLibrary(final Context context) {
+    public static void initialiseLibrary(final Context context, final String broadcastPrefix) {
         if (!initialised) {
             if (showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": initialiseLibrary");
+            LocationLibrary.broadcastPrefix = broadcastPrefix;
             final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             if (!prefs.getBoolean(LocationLibraryConstants.SP_KEY_RUN_ONCE, Boolean.FALSE)) {
                 if (showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": initialiseLibrary: first time ever run -> start alarm and listener");
@@ -132,13 +135,13 @@ public class LocationLibrary {
      * @param locationMaximumAge The maximum age of a location update. If when the alarm fires the location is
      * older than this, a location update will be requested. The default is {@link android.app.AlarmManager#INTERVAL_HOUR AlarmManager.INTERVAL_HOUR}
      * 
-     * @see #initialiseLibrary(Context)
+     * @see #initialiseLibrary(Context, String)
      */
-    public static void initialiseLibrary(final Context context, final long alarmFrequency, final int locationMaximumAge) {
+    public static void initialiseLibrary(final Context context, final long alarmFrequency, final int locationMaximumAge, final String broadcastPrefix) {
         if (!initialised) {
             LocationLibrary.alarmFrequency = alarmFrequency;
             LocationLibrary.locationMaximumAge = locationMaximumAge;
-            initialiseLibrary(context);
+            initialiseLibrary(context, broadcastPrefix);
          }
     }
     
@@ -152,12 +155,12 @@ public class LocationLibrary {
      * @param broadcastEveryLocationUpdate If true, broadcasts every location update using intent action 
      * LocationLibraryConstants.LOCATION_CHANGED_TICKER_BROADCAST_ACTION
      * 
-     * @see #initialiseLibrary(Context)
+     * @see #initialiseLibrary(Context, String)
      */
-    public static void initialiseLibrary(final Context context, final boolean broadcastEveryLocationUpdate) {
+    public static void initialiseLibrary(final Context context, final boolean broadcastEveryLocationUpdate, final String broadcastPrefix) {
         if (!initialised) {
             LocationLibrary.broadcastEveryLocationUpdate = broadcastEveryLocationUpdate;
-            initialiseLibrary(context);
+            initialiseLibrary(context, broadcastPrefix);
          }
     }
     
@@ -178,78 +181,14 @@ public class LocationLibrary {
      * @param broadcastEveryLocationUpdate If true, broadcasts every location update using intent action 
      * LocationLibraryConstants.LOCATION_CHANGED_TICKER_BROADCAST_ACTION
      * 
-     * @see #initialiseLibrary(Context, long, int)
-     * @see #initialiseLibrary(Context, boolean)
-     * @see #initialiseLibrary(Context)
-     */
-    public static void initialiseLibrary(final Context context, final long alarmFrequency, final int locationMaximumAge, final boolean broadcastEveryLocationUpdate) {
-        if (!initialised) {
-            LocationLibrary.broadcastEveryLocationUpdate = broadcastEveryLocationUpdate;
-            initialiseLibrary(context, alarmFrequency, locationMaximumAge);
-        }    
-    }
-    
-    /**
-     * To use this library, call initialiseLibrary from your Application's onCreate method,
-     * having set up your manifest as detailed in the project documentation.
-     * 
-     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
-     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
-     * 
-     * @see #initialiseLibrary(Context)
-     */
-    public static void initialiseLibrary(final Context context, final String broadcastPrefix) {
-        if (!initialised) {
-            LocationLibrary.broadcastPrefix = broadcastPrefix;
-            initialiseLibrary(context);
-         }
-    }
-    
-    /**
-     * To use this library, call initialiseLibrary from your Application's onCreate method,
-     * having set up your manifest as detailed in the project documentation.
-     * 
-     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
-     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
-     * 
-     * @see #initialiseLibrary(Context, long, int)
-     */
-    public static void initialiseLibrary(final Context context, final long alarmFrequency, final int locationMaximumAge, final String broadcastPrefix) {
-        if (!initialised) {
-            LocationLibrary.broadcastPrefix = broadcastPrefix;
-            initialiseLibrary(context, alarmFrequency, locationMaximumAge);
-         }
-    }
-    
-    /**
-     * To use this library, call initialiseLibrary from your Application's onCreate method,
-     * having set up your manifest as detailed in the project documentation.
-     * 
-     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
-     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
-     * 
-     * @see #initialiseLibrary(Context, boolean)
-     */
-    public static void initialiseLibrary(final Context context, final boolean broadcastEveryLocationUpdate, final String broadcastPrefix) {
-        if (!initialised) {
-            LocationLibrary.broadcastPrefix = broadcastPrefix;
-            initialiseLibrary(context, broadcastEveryLocationUpdate);
-         }
-    }
-    
-    /**
-     * To use this library, call initialiseLibrary from your Application's onCreate method,
-     * having set up your manifest as detailed in the project documentation.
-     * 
-     * @param broadcastPrefix The prefix to the broadcasts, should a choice other than the default "com.littlefluffytoys" be required.
-     * This can be useful if other apps on the device are using the library, and you only want your app to respond to your instance of the library. 
-     * 
-     * @see #initialiseLibrary(Context, long, int, boolean)
+     * @see #initialiseLibrary(Context, long, int, String)
+     * @see #initialiseLibrary(Context, boolean, String)
+     * @see #initialiseLibrary(Context, String)
      */
     public static void initialiseLibrary(final Context context, final long alarmFrequency, final int locationMaximumAge, final boolean broadcastEveryLocationUpdate, final String broadcastPrefix) {
         if (!initialised) {
-            LocationLibrary.broadcastPrefix = broadcastPrefix;
-            initialiseLibrary(context, alarmFrequency, locationMaximumAge, broadcastEveryLocationUpdate);
+            LocationLibrary.broadcastEveryLocationUpdate = broadcastEveryLocationUpdate;
+            initialiseLibrary(context, alarmFrequency, locationMaximumAge, broadcastPrefix);
         }    
     }
     

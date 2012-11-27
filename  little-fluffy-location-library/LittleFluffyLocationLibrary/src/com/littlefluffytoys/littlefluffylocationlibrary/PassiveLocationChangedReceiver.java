@@ -53,11 +53,20 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
         // it's a one-shot update from Gingerbread and higher
         if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ":onReceive: on-demand location update received");
 
-        // we know that the passive provider will shortly get an update from this.
-        // Sometimes it will get two or three updates in quick succession.
-        // So, let this onReceive execute, and update itself.
-        // And then force a service call in 30 seconds. Simples!
-        LocationBroadcastService.forceDelayedServiceCall(context, 30);
+        if (LocationLibraryConstants.SUPPORTS_JELLYBEAN_4_2 && intent.hasExtra(key)) {
+            // Location behaviour changed in Android 4.2 - the one-shot location gets sent as an extra in the original intent (as it probably should have done all along...)
+            // Therefore, process this single one-shot location update.
+            if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ":onReceive: SUPPORTS_JELLYBEAN_4_2 and contains location key => processing");
+
+            processLocation(context, (Location)intent.getExtras().get(key));
+        }
+        else {
+            // Before Android 4.2, this update is followed by one or more updates from the passive location provider over a few seconds.
+            // So, let this onReceive execute, and update itself. And then force a service call in 30 seconds. Simples!
+            if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ":onReceive: pre-JELLYBEAN_4_2 => wait for update(s) from passive location provider");
+
+            LocationBroadcastService.forceDelayedServiceCall(context, 30);
+        }
     }
     else if (intent.hasExtra(key)) {
         // This update came from Passive provider, so we can extract the location directly.
@@ -97,6 +106,8 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
           }
       }
       
+      final long previousTime = prefs.getLong(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_TIME, thisTime);
+
       final Editor prefsEditor = prefs.edit();
       
       prefsEditor.putLong(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_TIME, thisTime);
@@ -115,5 +126,16 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
           // broadcast it
           LocationBroadcastService.sendBroadcast(context, prefs, false);
       }
-  }
+      
+      if (thisTime - previousTime > LocationLibrary.getAlarmFrequency()) {
+          // We just got a location update that's longer apart than our usual alarm frequency,
+          // so we should force this location update as a periodic update too.
+          // Often, the device will get two or three location updates in quick succession.
+          // So, instead of sending this immediately, force the send in 10 seconds.
+          // If another location update comes in in the meantime, it will overwrite this one.
+          // Location update will finally be sent 10 seconds after the last in this updates flurry was received.
+          if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ":processLocation: treating this update as a periodic update");
+          LocationBroadcastService.forceDelayedServiceCall(context, 10);
+      }
+   }
 }

@@ -89,10 +89,11 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
       final float thisLong =  ((int) (location.getLongitude() * 1000000)) / 1000000f;
       final int thisAccuracy = (int) location.getAccuracy();
       final long thisTime = location.getTime();
+      final String thisOriginProvider = location.getProvider();
       
       if (lastLat != Long.MIN_VALUE) {
           // The tricky maths bit to calculate the distance between two points:
-          // dist = arccos(sin(lat1) · sin(lat2) + cos(lat1) · cos(lat2) · cos(lon1 - lon2)) · R
+          // dist = arccos(sin(lat1) Â· sin(lat2) + cos(lat1) Â· cos(lat2) Â· cos(lon1 - lon2)) Â· R
           int distanceBetweenInMetres = (int) (Math.acos(Math.sin(Math.toRadians(thisLat)) * Math.sin(Math.toRadians(lastLat)) + Math.cos(Math.toRadians(thisLat)) * Math.cos(Math.toRadians(lastLat)) * Math.cos(Math.toRadians(thisLong) - Math.toRadians(lastLong))) * 6371 * 1000);
           if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": Distance from last reading: " + distanceBetweenInMetres + "m");
           
@@ -115,6 +116,7 @@ public class PassiveLocationChangedReceiver extends BroadcastReceiver {
           prefsEditor.putFloat(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_LAT, thisLat);
           prefsEditor.putFloat(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_LNG, thisLong);
           prefsEditor.putInt(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_ACCURACY, thisAccuracy);
+          prefsEditor.putString(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_ORIGIN_PROVIDER, thisOriginProvider);
           if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": Storing location update, lat=" + thisLat + " long=" + thisLong + " accuracy=" + thisAccuracy + " time=" + thisTime + "(" + DateFormat.format("kk:mm.ss, E", thisTime) + ")");
       }
       else {

@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
+import android.util.Log;
 
 /**
  * An object containing a snapshot of the best we currently know about location.
@@ -31,7 +32,7 @@ import android.text.format.DateFormat;
  * @author Kenton Price, Little Fluffy Toys Ltd - {@link www.littlefluffytoys.mobi}
  */
 public class LocationInfo implements Serializable {
-    
+	private static final String TAG = "LocationInfo";
     private static final long serialVersionUID = 1L;
 
     public long lastLocationUpdateTimestamp;
@@ -39,7 +40,7 @@ public class LocationInfo implements Serializable {
     public float lastLat;
     public float lastLong;
     public int lastAccuracy;
-    public String originProvider;
+    public String originProvider = null;
 
     /**
      * The constructor populates the public fields with the latest location info. 
@@ -59,6 +60,7 @@ public class LocationInfo implements Serializable {
         lastLong = ((int) (prefs.getFloat(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_LNG, Integer.MIN_VALUE) * 1000000f)) / 1000000f;
         lastAccuracy = prefs.getInt(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_ACCURACY, Integer.MAX_VALUE);
         originProvider = prefs.getString(LocationLibraryConstants.SP_KEY_LAST_LOCATION_UPDATE_ORIGIN_PROVIDER, null);
+        if (LocationLibrary.showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ":refresh - this=" + this);
     }
 
     /**
@@ -99,9 +101,10 @@ public class LocationInfo implements Serializable {
     
     @Override
     public String toString() {
-        return (String.format("lastLocationUpdateTimestamp=%1$s lastLocationBroadcastTimestamp=%2$s lastLat=%3$.6f lastLong=%4$.6f lastAccuracy=%5$d",
+        return (String.format("lastLocationUpdateTimestamp=%1$s lastLocationBroadcastTimestamp=%2$s lastLat=%3$.6f lastLong=%4$.6f lastAccuracy=%5$d originProvider=%6$s",
                 lastLocationUpdateTimestamp != 0 ? formatTimeAndDay(lastLocationUpdateTimestamp, true) : "none",
                 lastLocationBroadcastTimestamp != 0 ? formatTimeAndDay(lastLocationBroadcastTimestamp, true) : "none",
-                lastLat, lastLong, lastAccuracy));
+                lastLat, lastLong, lastAccuracy, 
+                originProvider != null ? originProvider : "none"));
     }
 }

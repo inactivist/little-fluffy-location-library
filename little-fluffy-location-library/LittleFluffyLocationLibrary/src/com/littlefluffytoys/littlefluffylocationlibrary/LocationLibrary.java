@@ -109,7 +109,7 @@ public class LocationLibrary {
      */
     public static void initialiseLibrary(final Context context, final String broadcastPrefix) {
         if (!initialised) {
-            if (showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + ": initialiseLibrary");
+            if (showDebugOutput) Log.d(LocationLibraryConstants.TAG, TAG + String.format(": initialiseLibrary(%s, %s)", context, broadcastPrefix));
             LocationLibrary.broadcastPrefix = broadcastPrefix;
             final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             if (!prefs.getBoolean(LocationLibraryConstants.SP_KEY_RUN_ONCE, Boolean.FALSE)) {
